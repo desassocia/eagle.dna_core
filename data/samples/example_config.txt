@@ -1,0 +1,1 @@
+eagle.dna_core demo file\nHarmless local sample.\nproxy: example setting\n
