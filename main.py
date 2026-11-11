@@ -164,7 +164,7 @@ def file_database():
         print(f" ... e mais {len(files) - 40} arquivos.")
 
 def generate_lab_files():
-    folders = ("logs", "configs", "reports", "events", "cache")
+    folders = ("logs", "configs", "reports", "events", "cache", "network", "system", "telemetry", "sessions", "database")
     extensions = (".txt", ".log", ".json", ".ini", ".cfg", ".csv", ".md")
     messages = (
         "status=simulation_only", "event=sample_created",
@@ -172,9 +172,9 @@ def generate_lab_files():
         "remote_access=disabled", "dma_bypass=not_implemented",
         "result=harmless_test_record", "integrity=demo"
     )
-    total = 120
+    total = 500
     print(GREEN + "\n[ lab.generate ]" + RESET)
-    print("Criando 120 arquivos fictícios em data/lab_generated/")
+    print("Criando 500 arquivos fictícios em data/lab_generated/")
     print("Tudo ficará dentro da pasta do projeto.\n")
     created = 0
     for i in range(1, total + 1):
@@ -194,7 +194,8 @@ def generate_lab_files():
         path.write_text(content, encoding="utf-8")
         created += 1
         if i % 10 == 0 or i == total:
-            bar = "#" * (i // 5) + "-" * (24 - i // 5)
+            filled = (24 * i) // total
+            bar = "#" * filled + "-" * (24 - filled)
             print(f" [{bar}] {i:3}/{total} | {path.relative_to(ROOT)}")
     summary = {"created": created, "folder": str(LAB.relative_to(ROOT)),
                "time": datetime.now().isoformat(timespec="seconds"), "type": "fictional_demo"}
