@@ -139,7 +139,48 @@ def file_database():
     print(f"Arquivos locais de demonstração: {len(files)}")
     for path in files[:30]: print(" •", path.relative_to(ROOT))
 
-def menu():
+
+def generate_lab_files():
+    """Gera arquivos fictícios apenas dentro de data/lab_generated."""
+    import random
+    import time
+    base = DATA / "lab_generated"
+    folders = ("logs", "configs", "reports", "events", "cache")
+    extensions = (".txt", ".log", ".json", ".ini", ".cfg", ".csv", ".md")
+    messages = (
+        "status=simulation_only", "event=sample_created",
+        "proxy=demo.local", "dns=192.0.2.53",
+        "remote_access=disabled", "dma_bypass=not_implemented",
+        "result=harmless_test_record", "integrity=demo"
+    )
+    total = 120
+    print(GREEN + "\\n[ lab.generate ]" + RESET)
+    print("Criando 120 arquivos fictícios em data/lab_generated/")
+    print("Nenhum arquivo fora dessa pasta será alterado.\\n")
+    created = 0
+    for i in range(1, total + 1):
+        folder = base / folders[(i - 1) % len(folders)]
+        folder.mkdir(parents=True, exist_ok=True)
+        ext = extensions[(i - 1) % len(extensions)]
+        path = folder / f"sample_{i:03d}{ext}"
+        stamp = datetime.now().isoformat(timespec="seconds")
+        if ext == ".json":
+            content = json.dumps({"id": i, "timestamp": stamp, "mode": "fictional", "records": random.sample(messages, 3)}, indent=2)
+        elif ext == ".csv":
+            content = "id,timestamp,event\\n" + f"{i},{stamp},sample_created\\n"
+        else:
+            content = f"EAGLE DNA CORE / FICTIONAL LAB\\nID={i:03d}\\nTIME={stamp}\\n" + "\\n".join(random.sample(messages, 4)) + "\\n"
+        path.write_text(content, encoding="utf-8")
+        created += 1
+        if i % 10 == 0 or i == total:
+            bar = "#" * (i // 5) + "-" * (24 - i // 5)
+            print(f" [{bar}] {i:3}/{total} | criado: {path.relative_to(ROOT)}")
+    summary = {"created": created, "folder": str(base.relative_to(ROOT)), "time": datetime.now().isoformat(timespec="seconds"), "type": "fictional_demo"}
+    (base / "generation_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(GREEN + f"\\n[ OK ] {created} arquivos fictícios criados." + RESET)
+    print("Pasta: data/lab_generated/")
+    print("Use file.database para listar as amostras ou analyze.files para analisá-las (as amostras permanecem isoladas da pasta samples).")
+\ndef menu():
     actions = {
         "1": ("analyze.files", scan_files), "2": ("deep.scan", deep_scan),
         "3": ("proxy.analysis", proxy_analysis), "4": ("dns.monitor", dns_monitor),
