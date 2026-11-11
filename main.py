@@ -52,7 +52,7 @@ def add_history(entry):
 def scan_files():
     print(GREEN + "\n[ analyze.files ]" + RESET)
     found, checked = [], 0
-    for path in SAMPLES.rglob("*"):
+    for source_root in (SAMPLES, DATA / "lab_generated"):\n        if not source_root.exists(): continue\n        for path in source_root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in SUPPORTED: continue
         try:
             if path.stat().st_size > 1_000_000: continue
@@ -135,7 +135,7 @@ def scan_history():
 
 def file_database():
     print(GREEN + "\n[ file.database ]" + RESET)
-    files = [p for p in SAMPLES.rglob("*") if p.is_file()]
+    files = [p for root in (SAMPLES, DATA / "lab_generated") if root.exists() for p in root.rglob("*") if p.is_file()]
     print(f"Arquivos locais de demonstração: {len(files)}")
     for path in files[:30]: print(" •", path.relative_to(ROOT))
 
